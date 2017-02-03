@@ -3,17 +3,21 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Building..'
+                GOOS=darwin GOARCH=amd64 go build -o hello-jenkinsfile.darwin.amd64
+                GOOS=linux GOARCH=amd64 go build -o hello-jenkinsfile.linux.amd64
             }
         }
         stage('Test'){
             steps {
-                echo 'Testing..'
+                go test -v ./...
             }
         }
         stage('Deploy') {
             steps {
-                echo 'Deploying....'
+                echo -n "uploading darwin artifact => "
+                curl -s chunk.io -T hello-jenkinsfile.darwin.amd64
+                echo -n "uploading linux artifact => "
+                curl -s chunk.io -T hello-jenkinsfile.linux.amd64
             }
         }
     }
